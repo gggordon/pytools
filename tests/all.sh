@@ -10,29 +10,27 @@
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
 #
-#  http://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/harisekhon
 #
 
 set -euo pipefail
+[ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ================== #
-# Running ALL
-# ================== #
-"
+. "$srcdir/utils.sh"
 
-cd "$srcdir";
+# imported by utils.sh above
+#. "$srcdir/../bash-tools/utils.sh"
 
-./compile.sh
+export PROJECT=pytools
 
-#./syntax.sh
+section "Running PyTools ALL"
 
-#./python3.sh
+# runs against . by default
+cd "$srcdir/..";
+bash-tools/all.sh
 
-for script in $(find . -name 'test*.sh'); do
-    ./$script -vvv
-done
+bash-tools/run_tests.sh
 
 # do help afterwards for Spark to be downloaded, and then help will find and use downloaded spark for SPARK_HOME
-./help.sh
+tests/help.sh

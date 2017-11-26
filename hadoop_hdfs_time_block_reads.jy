@@ -86,13 +86,15 @@ Implications:
 """ % (os.path.basename(__file__), __version__, os.path.basename(__file__))
 #-a --all-blocks         Fetch all copies of all blocks from all datanodes (--one-block-per-DN shortcuts this) [Not implemented yet]
 
+# Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
 import getopt
 import socket
 import sys
 import time
 sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
-    from harisekhon.utils import *
+    from harisekhon.utils import jython_only, die, printerr, ERRORS, \
+                                 isJavaOOM, java_oom_fix_msg, log_jython_exception, get_jython_exception
 except ImportError, e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
@@ -223,7 +225,6 @@ class HDFSBlockReader:
     def fetchFilelistBlocksTimed(self, filelist):
         """ Recurses directories and calls fetchFileBlocksTimed(file) per file """
 
-        
         #if(len(filelist) > 1 or (self.get_path(filelist[0]) and self.fs.isDirectory(self.get_path(filelist[0])))):
         if(len(filelist) > 1 or self.fs.isDirectory(self.get_path(filelist[0]))):
             # even if there is only one file under the whole directory tree since it's now different to the specified arg we should print it
@@ -331,7 +332,7 @@ class HDFSBlockReader:
             try:
                 block_locations = self.fs.getFileBlockLocations(path, self.offset, self.length)
             except:
-                raise IOError, "Failed to get block locations for %sblock %d (offset %d, length %d): %s" (self.fileoutput, self.block_num, self.offset, self.length, get_jython_exception())
+                raise IOError, "Failed to get block locations for %sblock %d (offset %d, length %d): %s" % (self.fileoutput, self.block_num, self.offset, self.length, get_jython_exception())
             if not block_locations:
                 return
             for block in block_locations:

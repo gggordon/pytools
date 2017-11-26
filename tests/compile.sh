@@ -10,18 +10,26 @@
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
 #
-#  http://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/harisekhon
 #
 
 set -eu
+[ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
 . ./tests/utils.sh
 
-for x in $(echo *.py *.jy 2>/dev/null); do
+hr
+echo "Compiling all Python files"
+hr
+echo
+
+for x in $(find . -iname '*.py' -o -iname '*.jy'); do
     isExcluded "$x" && continue
     echo "compiling $x"
     python -m py_compile $x
 done
+echo
+echo
